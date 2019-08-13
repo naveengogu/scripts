@@ -1,0 +1,28 @@
+job('nodejs') {
+	label('slave')
+    scm {
+        github('naveengogu/Maven-Java-Project')
+    }
+    steps {
+        shell('mvn clean package')
+    }
+    steps {
+        dockerBuildAndPublish {
+            repositoryName('naveengogu1/tomcat')
+            tag('${BUILD_TIMESTAMP}-${GIT_REVISION,length=7}')
+            registryCredentials('docker')
+            forcePull(false)
+            createFingerprints(false)
+            skipDecorate()
+        }
+    }
+    steps {
+        publishOverSsh {
+            server('ansible') {
+                transferSet {
+                    execCommand('git clone https://github.com/naveengogu/ansibleroles.git ; cd ansibleroles ; ansible-playbook Docker-Install.yaml ; ansible-playbook Container-Start.yaml')
+                }
+            }
+        }
+    }
+}
