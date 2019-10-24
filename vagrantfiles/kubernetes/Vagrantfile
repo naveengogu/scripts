@@ -1,0 +1,30 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
+HOST_IP = '192.168.33.16'
+HOST2_IP = '192.168.33.17'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+config.vm.define "k8master" do |k8master|
+k8master.vm.hostname = "k8master.rnstech.com"
+k8master.vm.box = "ubuntu/xenial64"
+k8master.vm.box_url = "ubuntu/xenial64"
+k8master.vm.network :private_network,
+      ip: HOST_IP,
+      netmask: '255.255.255.0'
+k8master.vm.network :forwarded_port, guest: 80, host: 8081
+#k8master.vm.synced_folder 'html', '/var/www/html'
+#k8master.vm.provision 'shell', path: 'provision.sh'	
+end
+
+config.vm.define "k8slave" do |k8slave|
+k8slave.vm.hostname = "k8slave.rnstech.com"
+k8slave.vm.box = "ubuntu/xenial64"
+k8slave.vm.box_url = "ubuntu/xenial64"
+k8slave.vm.network :private_network,
+      ip: HOST2_IP,
+      netmask: '255.255.255.0'
+end
+end
